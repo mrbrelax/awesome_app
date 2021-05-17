@@ -7,13 +7,13 @@ import 'package:awesome_app/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class MyHomePage extends StatefulWidget {
-  static const String routeName = "/home";
+class MyHomePageFB extends StatefulWidget {
+  static const String routeName = "/homefb";
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageFBState createState() => _MyHomePageFBState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageFBState extends State<MyHomePageFB> {
   // var myText = "Change My Name";
   // TextEditingController _nameController = TextEditingController();
   var url = "https://jsonplaceholder.typicode.com/photos";
@@ -25,10 +25,10 @@ class _MyHomePageState extends State<MyHomePage> {
     fetchData();
   }
 
-  fetchData() async {
+  Future fetchData() async {
     var res = await http.get(Uri.parse(url));
     data = jsonDecode(res.body);
-    setState(() {});
+    return data;
   }
 
   @override
@@ -53,17 +53,38 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: data != null
-          ? ListView.builder(
-              itemBuilder: (context, index) {
-                return ListTile(
+      body: FutureBuilder(
+        future: fetchData(),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return Center(
+                child: Text("Fetch Something"),
+              );
+            case ConnectionState.active:
+            case ConnectionState.waiting:
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            case ConnectionState.done:
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text("Some Error occured"),
+                );
+              }
+              return ListView.builder(
+                itemBuilder: (context, index) {
+                  return ListTile(
                     title: Text(data[index]["title"]),
                     subtitle: Text("ID: ${data[index]["id"]}"),
-                    leading: Image.network(data[index]["url"]));
-              },
-              itemCount: data.length,
-            )
-          : Center(child: CircularProgressIndicator()),
+                    leading: Image.network(data[index]["url"]),
+                  );
+                },
+                itemCount: data.length,
+              );
+          }
+        },
+      ),
       drawer: MyDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -71,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
             // myText = _nameController.text;
           });
         },
-        child: Icon(Icons.send),
+        child: Icon(Icons.refresh),
       ),
     );
   }

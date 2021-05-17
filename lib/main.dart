@@ -1,7 +1,12 @@
 import 'package:awesome_app/pages/home/home.dart';
+import 'package:awesome_app/pages/login/login_page.dart';
+import 'package:awesome_app/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Constants.prefs = await SharedPreferences.getInstance();
   runApp(MyApp());
 }
 
@@ -11,11 +16,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.blue,
-        primaryColorLight: Colors.lightBlue,
-        accentColor: Colors.blueAccent
-      ),
-      home: MyHomePage(),
+          primaryColor: Colors.blue,
+          primaryColorLight: Colors.lightBlue,
+          accentColor: Colors.blueAccent),
+      home: Constants.prefs.getBool("loggedIn") == true
+          ? MyHomePage()
+          : LoginPage(),
+      routes: {
+        LoginPage.routeName: (context) => LoginPage(),
+        MyHomePage.routeName: (context) => MyHomePage(),
+      },
     );
   }
 }
