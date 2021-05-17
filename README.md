@@ -1,7 +1,6 @@
-# awesome_app
+# Awesome App
 
-A new Flutter project.
-
+Awesome App adalah aplikasi basic yang sederhana dengan menggunakan drawer, lisview, floatingactionbutton, iconbutton. Awesome App ini menggunakan http client json dan state management.
 ## Getting Started
 
 This project is a starting point for a Flutter application.
